@@ -1,0 +1,81 @@
+<%@ jet 
+imports="
+    org.talend.core.model.process.INode 
+    org.talend.core.model.process.ElementParameterParser 
+    org.talend.core.model.metadata.IMetadataTable 
+    org.talend.core.model.metadata.IMetadataColumn 
+    org.talend.designer.codegen.config.CodeGeneratorArgument
+    org.talend.core.model.process.IConnection
+    org.talend.core.model.process.IConnectionCategory
+    java.util.List
+" 
+%>
+
+<%
+CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+INode node = (INode)codeGenArgument.getArgument();
+String cid = node.getUniqueName();
+List< ? extends IConnection> conns = node.getOutgoingSortedConnections();
+
+List<IMetadataTable> metadatas = node.getMetadataList();
+if ((metadatas!=null)&&(metadatas.size()>0)) {
+    IMetadataTable metadata = metadatas.get(0);
+    if (metadata!=null) {
+
+        String spreadsheet = ElementParameterParser.getValue(node,"__SPREADSHEET__");
+		String worksheet =  ElementParameterParser.getValue(node,"__WORKSHEET__");
+		String username =  ElementParameterParser.getValue(node,"__USER__");
+		String password =  ElementParameterParser.getValue(node,"__PASSWORD__");
+		Boolean bUseKey =  ElementParameterParser.getValue(node,"__USEKEY__").equals("true"); 
+		%>
+	
+		int nb_line<%=cid%> = 0;
+	
+		Boolean bUseKey<%=cid%> = <%=bUseKey%>;
+		String ss<%=cid%> = <%=spreadsheet%>;
+		String ws<%=cid%> = <%=worksheet%>;
+		String un<%=cid%> = <%=username%>;
+		String pw<%=cid%> = <%=password%>;
+		
+       // Create a new Spreadsheet service
+        com.google.gdata.client.spreadsheet.SpreadsheetService myService = new com.google.gdata.client.spreadsheet.SpreadsheetService("My Application");
+        myService.setUserCredentials(un<%=cid%>,pw<%=cid%>);
+        
+		com.google.gdata.data.spreadsheet.SpreadsheetEntry mysheet;
+		if (bUseKey<%=cid%>) {
+			// Get a list of all entries
+			java.net.URL metafeedUrl = new java.net.URL("http://spreadsheets.google.com/feeds/spreadsheets/" + ss<%=cid%>);
+			mysheet = myService.getEntry(metafeedUrl, com.google.gdata.data.spreadsheet.SpreadsheetEntry.class);
+		} else {
+			java.net.URL metafeedUrl = new java.net.URL("http://spreadsheets.google.com/feeds/spreadsheets/private/full");
+			com.google.gdata.data.spreadsheet.SpreadsheetFeed resultFeed = myService.getFeed(metafeedUrl, com.google.gdata.data.spreadsheet.SpreadsheetFeed.class);
+			List<com.google.gdata.data.spreadsheet.SpreadsheetEntry> entries = resultFeed.getEntries();
+			mysheet = entries.get(0);
+			for(int i=0; i<entries.size(); i++) {
+				if (entries.get(i).getTitle().getPlainText().equals(ss<%=cid%>)) {
+					mysheet = entries.get(i);
+					i = entries.size();
+				}
+			}
+		}
+		
+		com.google.gdata.data.spreadsheet.WorksheetEntry myworksheet;
+		myworksheet = mysheet.getDefaultWorksheet();
+		if (!ws<%=cid%>.equals("")) {
+			//a worksheet has been provided, so try to find that one. if none can be found, use the default instead
+			java.util.List<com.google.gdata.data.spreadsheet.WorksheetEntry> worksheetlist = mysheet.getWorksheets();
+			 for (int j=0; j<worksheetlist.size(); j++) {
+              com.google.gdata.data.spreadsheet.WorksheetEntry wsentry = worksheetlist.get(j);
+			  if (wsentry.getTitle().getPlainText().equals(ws<%=cid%>)) {
+				myworksheet = wsentry;
+			  }
+			 }
+		}
+		  java.net.URL listFeedUrl = myworksheet.getListFeedUrl();
+		  com.google.gdata.data.spreadsheet.ListFeed feed = myService.getFeed(listFeedUrl, com.google.gdata.data.spreadsheet.ListFeed.class);
+
+		  for (com.google.gdata.data.spreadsheet.ListEntry row : feed.getEntries()) {
+	<%
+    }
+}
+%>

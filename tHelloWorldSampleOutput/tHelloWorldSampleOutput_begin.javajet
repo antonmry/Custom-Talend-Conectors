@@ -1,0 +1,36 @@
+<%@ jet 
+imports="
+    org.talend.core.model.process.INode 
+    org.talend.core.model.process.ElementParameterParser 
+    org.talend.core.model.metadata.IMetadataTable 
+    org.talend.core.model.metadata.IMetadataColumn 
+    org.talend.designer.codegen.config.CodeGeneratorArgument
+    org.talend.core.model.process.IConnection
+    org.talend.core.model.process.IConnectionCategory
+    java.util.List
+" 
+%>
+
+<%
+CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+INode node = (INode)codeGenArgument.getArgument();
+String cid = node.getUniqueName();
+List< ? extends IConnection> conns = node.getOutgoingSortedConnections();
+
+List<IMetadataTable> metadatas = node.getMetadataList();
+if ((metadatas!=null)&&(metadatas.size()>0)) {
+    IMetadataTable metadata = metadatas.get(0);
+    if (metadata!=null) {
+
+		String parameter =  ElementParameterParser.getValue(node,"__PARAMETER__"); 
+%>
+	
+int nb_line<%=cid%> = 0;
+
+String pw<%=cid%> = <%=parameter%>;
+		
+
+	<%
+    }
+}
+%>

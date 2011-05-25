@@ -1,0 +1,57 @@
+<%@ jet 
+imports="
+    	org.talend.core.model.process.INode 
+    	org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.metadata.IMetadataTable 
+		org.talend.core.model.metadata.IMetadataColumn
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.core.model.metadata.types.JavaTypesManager
+		org.talend.core.model.metadata.types.JavaType		
+		java.util.List
+		java.util.Map
+		"
+%>
+<%
+CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+INode node = (INode)codeGenArgument.getArgument();
+
+List<IMetadataTable> metadatas = node.getMetadataList();
+if ((metadatas!=null)&&(metadatas.size()>0)) {//1
+    IMetadataTable metadata = metadatas.get(0);
+    if (metadata!=null) {//2
+        String cid = node.getUniqueName();
+
+    	List< ? extends IConnection> conns = node.getIncomingConnections();
+    	for (IConnection conn : conns) {//3
+    		if (conn.getLineStyle().hasConnectionCategory(IConnectionCategory.DATA)) {//4
+%>
+///////////////////////		
+						
+<%  
+    			List<IMetadataColumn> columns = metadata.getListColumns();
+    			int sizeColumns = columns.size();
+%>
+
+<%    			
+		for (int i = 0; i < sizeColumns; i++) {//5
+		
+			IMetadataColumn column = columns.get(i);
+			JavaType javaType = JavaTypesManager.getJavaTypeFromId(column.getTalendType());
+%>
+
+	System.out.println("Column title: <%=column.getLabel() %>: ");
+	System.out.println("Row number (row1): <%=conn.getName() %>");
+	System.out.println("Precision (null): <%=column.getPrecision() %>");
+	System.out.println("Pattern (empty): <%=column.getPattern()%>");
+	
+	System.out.println("Valor: "+<%=conn.getName() %>.<%=column.getLabel() %>);
+
+<%
+		}//5
+	}//4
+}//3
+}//2
+}//1
+%>    	

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<COMPONENT> 
+  <HEADER AUTHOR="ThomasFriebel_AntonYuste" COMPATIBILITY="ALL" DATA_AUTO_PROPAGATE="false" PLATEFORM="ALL" RELEASE_DATE="20080229A" SERIAL="" STARTABLE="true" STATUS="ALPHA" VERSION="0.102"> 
+    <SIGNATURE/> 
+  </HEADER>  
+  <FAMILIES> 
+    <FAMILY>Internet/Google</FAMILY> 
+  </FAMILIES>  
+  <DOCUMENTATION> 
+    <URL/> 
+  </DOCUMENTATION>  
+  <CONNECTORS> 
+    <CONNECTOR CTYPE="FLOW" MAX_INPUT="0" MAX_OUTPUT="1"/>  
+    <CONNECTOR CTYPE="ITERATE" MAX_INPUT="1" MAX_OUTPUT="1"/>  
+    <CONNECTOR CTYPE="SUBJOB_OK" MAX_INPUT="1"/>  
+    <CONNECTOR CTYPE="SUBJOB_ERROR" MAX_INPUT="1"/> 
+  </CONNECTORS>  
+  <PARAMETERS> 
+    <PARAMETER FIELD="SCHEMA_TYPE" NAME="SCHEMA" NUM_ROW="1" REPOSITORY_VALUE="GENERIC" REQUIRED="true"/>  
+    <PARAMETER FIELD="TEXT" NAME="USER" NUM_ROW="10" REQUIRED="true">
+		<DEFAULT>""</DEFAULT>
+	</PARAMETER>  
+    <PARAMETER FIELD="TEXT" NAME="PASSWORD" NUM_ROW="20" REQUIRED="true">
+		<DEFAULT>""</DEFAULT>
+	</PARAMETER>      
+    <PARAMETER FIELD="CHECK" NAME="USEKEY" NUM_ROW="25" REQUIRED="false">
+    	<DEFAULT>true</DEFAULT>
+	</PARAMETER>  
+    <PARAMETER FIELD="TEXT" NAME="SPREADSHEET" NUM_ROW="30" REQUIRED="true">  
+		<DEFAULT>""</DEFAULT>
+	</PARAMETER>    
+    <PARAMETER FIELD="TEXT" NAME="WORKSHEET" NUM_ROW="40" REQUIRED="false">
+		<DEFAULT>""</DEFAULT>
+	</PARAMETER>     
+  </PARAMETERS>  
+  <ADVANCED_PARAMETERS></ADVANCED_PARAMETERS>
+  <CODEGENERATION> 
+    <IMPORTS>
+      <IMPORT MODULE="gdata-spreadsheet-meta-3.0.jar" NAME="gdata-spreadsheet-meta" REQUIRED="true"/>
+      <IMPORT MODULE="gdata-core-1.0.jar" NAME="gdata-core" REQUIRED="true"/>
+      <IMPORT MODULE="gdata-client-meta-1.0.jar" NAME="gdata-client-meta" REQUIRED="true"/>
+      <IMPORT MODULE="gdata-client-1.0.jar" NAME="gdata-client" REQUIRED="true"/>
+      <IMPORT MODULE="gdata-media-1.0.jar" NAME="gdata-media" REQUIRED="true"/>
+      <IMPORT MODULE="gdata-spreadsheet-3.0.jar" NAME="gdata-spreadsheet" REQUIRED="true"/>
+      <IMPORT MODULE="google-collect-1.0-rc1.jar" NAME="google-collect" REQUIRED="true"/>
+    </IMPORTS> 
+  </CODEGENERATION>  
+  <RETURNS> 
+    <RETURN AVAILABILITY="AFTER" NAME="NB_LINE" TYPE="id_Integer"/> 
+  </RETURNS> 
+</COMPONENT>

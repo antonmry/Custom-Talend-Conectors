@@ -1,0 +1,79 @@
+<%@ jet 
+imports="
+    org.talend.core.model.process.INode 
+    org.talend.core.model.process.ElementParameterParser 
+    org.talend.core.model.metadata.IMetadataTable 
+    org.talend.core.model.metadata.IMetadataColumn 
+    org.talend.designer.codegen.config.CodeGeneratorArgument
+    org.talend.core.model.process.IConnection		
+	org.talend.core.model.metadata.types.JavaTypesManager
+	org.talend.core.model.metadata.types.JavaType
+    org.talend.core.model.process.IConnectionCategory
+
+    java.util.List
+	java.util.ArrayList
+" 
+%>
+
+<%
+CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+INode node = (INode)codeGenArgument.getArgument();
+String cid = node.getUniqueName();
+List< ? extends IConnection> conns = node.getOutgoingSortedConnections();
+
+
+List<IMetadataTable> metadatas = node.getMetadataList();
+if ((metadatas!=null)&&(metadatas.size()>0)) {
+    IMetadataTable metadata = metadatas.get(0);
+    if (metadata!=null) {
+%>
+
+<%
+	String firstConnName = "";
+		if (conns!=null) {
+			if (conns.size()>0) {
+				IConnection conn = conns.get(0);
+				firstConnName = conn.getName();			
+				if (conn.getLineStyle().hasConnectionCategory(IConnectionCategory.DATA)) {%>			
+				<%=firstConnName %> = new <%=conn.getName() %>Struct();
+				<%	
+					List<IMetadataColumn> listColumns = metadata.getListColumns();
+					int sizeListColumns = listColumns.size();
+					
+					
+					
+					for (int valueN=0; valueN<sizeListColumns; valueN++) {
+						
+						IMetadataColumn column = listColumns.get(valueN);
+						JavaType javaType = JavaTypesManager.getJavaTypeFromId(column.getTalendType());
+						String typeToGenerate = JavaTypesManager.getTypeToGenerate(column.getTalendType(), column.isNullable());
+						String patternValue = column.getPattern() == null || column.getPattern().trim().length() == 0 ? null : column.getPattern();
+						%>
+							<%if (javaType == JavaTypesManager.STRING) { %>
+							<%=firstConnName %>.<%=column.getLabel()%> = row.getCustomElements().getValue("<%=column.getLabel()%>");
+							<%
+								} else 
+								if(javaType == JavaTypesManager.DATE) {
+							%>
+								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_Date(row.getCustomElements().getValue("<%=column.getLabel()%>"), <%= patternValue %>);
+							<%} else { %>
+								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_<%= typeToGenerate %>(row.getCustomElements().getValue("<%=column.getLabel()%>"));
+							<% } %>
+						
+	<%				}
+				}
+			}
+		}
+%>			
+        
+	nb_line<%=cid%>++;
+
+
+<%
+
+	
+    }
+}
+
+
+%>
