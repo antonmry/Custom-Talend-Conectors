@@ -50,14 +50,14 @@ if ((metadatas!=null)&&(metadatas.size()>0)) {
 						String patternValue = column.getPattern() == null || column.getPattern().trim().length() == 0 ? null : column.getPattern();
 						%>
 							<%if (javaType == JavaTypesManager.STRING) { %>
-							<%=firstConnName %>.<%=column.getLabel()%> = row.getCustomElements().getValue("<%=column.getLabel()%>");
+							<%=firstConnName %>.<%=column.getLabel()%> = row<%=cid%>.getCustomElements().getValue("<%=column.getLabel()%>");
 							<%
 								} else 
 								if(javaType == JavaTypesManager.DATE) {
 							%>
-								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_Date(row.getCustomElements().getValue("<%=column.getLabel()%>"), <%= patternValue %>);
+								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_Date(row<%=cid%>.getCustomElements().getValue("<%=column.getLabel()%>"), <%= patternValue %>);
 							<%} else { %>
-								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_<%= typeToGenerate %>(row.getCustomElements().getValue("<%=column.getLabel()%>"));
+								<%=firstConnName %>.<%=column.getLabel() %> = ParserUtils.parseTo_<%= typeToGenerate %>(row<%=cid%>.getCustomElements().getValue("<%=column.getLabel()%>"));
 							<% } %>
 						
 	<%				}
